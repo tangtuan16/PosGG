@@ -77,21 +77,10 @@ public class SaleController {
         return BigDecimal.ZERO;
     }
 
-    public BigDecimal calculateTotalAmount() {
-        BigDecimal total = BigDecimal.ZERO;
-        for (CartItem item : cart) {
-            total = total.add(item.getTotalPrice());
-        }
-        return total;
-    }
-
     public BigDecimal checkout(String phoneNumber, String paymentMethod, String note, int staffId, String customerName) {
         return saleService.checkout(cart, phoneNumber, staffId, paymentMethod, note, customerName);
     }
 
-    public List<CartItem> getCart() {
-        return cart;
-    }
 
     public void clearCart() {
         cart.clear();

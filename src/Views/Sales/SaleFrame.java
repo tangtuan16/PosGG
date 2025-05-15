@@ -86,7 +86,7 @@ public class SaleFrame extends JFrame {
                 int row = productTable.getSelectedRow();
                 Product product = saleController.getProductById((int) productModel.getValueAt(row, 0));
                 if (product.getQuantity() <= 0) {
-                    showMessage( "Sản phẩm đã hết hàng!");
+                    JOptionPane.showMessageDialog(productTable, "Sản phẩm đã hết hàng!");
                     return;
                 }
                 addToCart(product);
@@ -207,7 +207,7 @@ public class SaleFrame extends JFrame {
                     updateQuantity(i, 1);
                     saleController.addToCart(product, 1);
                 } else {
-                    showMessage("Không thể mua quá số lượng tồn kho!");
+                    JOptionPane.showMessageDialog(this, "Không thể mua quá số lượng tồn kho!");
                 }
                 return;
             }
