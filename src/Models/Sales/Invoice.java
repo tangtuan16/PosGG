@@ -1,5 +1,6 @@
-package Models;
+package Models.Sales;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Invoice {
@@ -7,20 +8,22 @@ public class Invoice {
     private int customerId;
     private int staffId;
     private Date createdAt;
-    private double totalAmount;
-    private double discount;
-    private double finalAmount;
+    private BigDecimal totalAmount;
+    private BigDecimal discount;
+    private BigDecimal finalAmount;
     private String note;
     private String paymentMethod;
     private String status;
 
+    private String customerPhone;
     private String customerName;
     private String staffName;
 
-    public Invoice() {}
+    public Invoice() {
+    }
 
     public Invoice(int id, int customerId, int staffId, Date createdAt,
-                   double totalAmount, double discount, double finalAmount,
+                   BigDecimal totalAmount, BigDecimal discount, BigDecimal finalAmount,
                    String note, String paymentMethod, String status) {
         this.id = id;
         this.customerId = customerId;
@@ -67,27 +70,27 @@ public class Invoice {
         this.createdAt = createdAt;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    public double getDiscount() {
+    public BigDecimal getDiscount() {
         return discount;
     }
 
-    public void setDiscount(double discount) {
+    public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
 
-    public double getFinalAmount() {
+    public BigDecimal getFinalAmount() {
         return finalAmount;
     }
 
-    public void setFinalAmount(double finalAmount) {
+    public void setFinalAmount(BigDecimal finalAmount) {
         this.finalAmount = finalAmount;
     }
 
@@ -129,5 +132,13 @@ public class Invoice {
 
     public void setStaffName(String staffName) {
         this.staffName = staffName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
     }
 }

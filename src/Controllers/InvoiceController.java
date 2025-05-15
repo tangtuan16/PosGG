@@ -1,6 +1,7 @@
 package Controllers;
 
-import Models.Invoice;
+import Models.Sales.Invoice;
+import Models.Sales.InvoiceItem;
 import Services.InvoiceService;
 
 import java.util.Date;
@@ -14,7 +15,11 @@ public class InvoiceController {
         invoiceService = new InvoiceService();
     }
 
-    public List<Invoice> searchInvoices(String keyword, Date fromDate, Date toDate) {
+    public List<Invoice> searchInvoices(String keyword, String fromDate, String toDate) {
         return invoiceService.search(keyword, fromDate, toDate);
+    }
+
+    public List<InvoiceItem> getInvoiceItems(int invoiceId) {
+        return invoiceService.getInvoiceItems(invoiceId);
     }
 }

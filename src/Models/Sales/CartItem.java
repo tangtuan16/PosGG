@@ -1,4 +1,6 @@
-package Models;
+package Models.Sales;
+
+import Models.Product;
 
 import java.math.BigDecimal;
 
