@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnection {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/pos_gg?serverTimezone=Asia/Ho_Chi_Minh";
-    private static final String USER = System.getenv("DB_USER");
-    private static final String PASS = System.getenv("DB_PASS");
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/pos_db?useSSL=false&serverTimezone=UTC";
+    private static final String USER = System.getenv("USER");
+    private static final String PASS = System.getenv("PASS");
 
     static {
         try {
