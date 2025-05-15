@@ -37,7 +37,6 @@ public class Invoice {
         this.status = status;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }

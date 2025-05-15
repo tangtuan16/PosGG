@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SaleService {
 
@@ -103,12 +105,21 @@ public class SaleService {
                     customerId = rs.getInt("id");
                     customerTotalBill = rs.getBigDecimal("total_bill");
                 }
+                rs.close();
+                customerStmt.close();
             }
 
+            // Tổng hợp số lượng từng sản phẩm trong giỏ hàng
+            Map<Integer, Integer> productQuantityMap = new HashMap<>();
+            Map<Integer, Product> productMap = new HashMap<>();
             for (CartItem item : cart) {
                 total = total.add(item.getTotalPrice());
+                int productId = item.getProduct().getId();
+                productQuantityMap.put(productId, productQuantityMap.getOrDefault(productId, 0) + item.getQuantity());
+                productMap.put(productId, item.getProduct());
             }
 
+            // Tính phần trăm giảm giá dựa trên tổng tiền đã mua của khách hàng
             if (customerTotalBill.compareTo(BigDecimal.valueOf(1_000_000)) >= 0) {
                 discountPercent = new BigDecimal(customerTotalBill.divide(BigDecimal.valueOf(1_000_000), RoundingMode.FLOOR).intValue());
                 if (discountPercent.compareTo(BigDecimal.valueOf(10)) > 0) {
@@ -119,23 +130,44 @@ public class SaleService {
             BigDecimal discountAmount = total.multiply(discountPercent).divide(BigDecimal.valueOf(100));
             finalTotal = total.subtract(discountAmount);
 
-            try {
-                PdfUtils.generateInvoicePDF("invoice.pdf", cart, total, discountPercent, finalTotal, paymentMethod, note, customerName, phoneNumber);
-            } catch (IOException e) {
-                e.printStackTrace();
+            // Kiểm tra tồn kho từng sản phẩm với lock FOR UPDATE
+            for (Map.Entry<Integer, Integer> entry : productQuantityMap.entrySet()) {
+                int productId = entry.getKey();
+                int requiredQuantity = entry.getValue();
+                System.out.println("Required quantity: " + requiredQuantity);
+
+                PreparedStatement stockStmt = conn.prepareStatement("SELECT quantity FROM products WHERE id = ? FOR UPDATE");
+                stockStmt.setInt(1, productId);
+                ResultSet rsStock = stockStmt.executeQuery();
+
+                if (rsStock.next()) {
+                    int stock = rsStock.getInt("quantity");
+                    System.out.println("Stock: " + stock);
+                    if (stock < requiredQuantity) {
+                        rsStock.close();
+                        stockStmt.close();
+                        throw new SQLException("Sản phẩm id " + productId + " không đủ hàng trong kho.");
+                    }
+                } else {
+                    rsStock.close();
+                    stockStmt.close();
+                    throw new SQLException("Sản phẩm id " + productId + " không tồn tại.");
+                }
+                rsStock.close();
+                stockStmt.close();
             }
 
+            // Tạo hóa đơn trong DB
             PreparedStatement invoiceStmt = conn.prepareStatement("""
-                        INSERT INTO invoices (customer_id, staff_id, total_amount, discount, final_amount, note, payment_method)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """, Statement.RETURN_GENERATED_KEYS);
+            INSERT INTO invoices (customer_id, staff_id, total_amount, discount, final_amount, note, payment_method)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, Statement.RETURN_GENERATED_KEYS);
 
             if (customerId != null) {
                 invoiceStmt.setInt(1, customerId);
             } else {
                 invoiceStmt.setNull(1, Types.INTEGER);
             }
-
             invoiceStmt.setInt(2, staffId);
             invoiceStmt.setBigDecimal(3, total);
             invoiceStmt.setBigDecimal(4, discountPercent);
@@ -148,37 +180,35 @@ public class SaleService {
             rsInvoice.next();
             int invoiceId = rsInvoice.getInt(1);
 
-            for (CartItem item : cart) {
-                Product product = item.getProduct();
-                int quantity = item.getQuantity();
+            rsInvoice.close();
+            invoiceStmt.close();
+
+            // Thêm chi tiết hóa đơn và trừ kho gộp theo sản phẩm
+            for (Map.Entry<Integer, Integer> entry : productQuantityMap.entrySet()) {
+                int productId = entry.getKey();
+                int quantity = entry.getValue();
+
+                Product product = productMap.get(productId);
                 BigDecimal unitPrice = product.getSellingPrice();
                 BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
-                PreparedStatement stockCheckStmt = conn.prepareStatement("SELECT quantity FROM products WHERE id = ?");
-                stockCheckStmt.setInt(1, product.getId());
-                ResultSet stockRs = stockCheckStmt.executeQuery();
-                if (stockRs.next()) {
-                    int currentStock = stockRs.getInt("quantity");
-                    if (currentStock < quantity) {
-                        throw new SQLException("Sản phẩm '" + product.getName() + "' không đủ hàng trong kho.");
-                    }
-                }
-
                 PreparedStatement detailStmt = conn.prepareStatement("""
-                            INSERT INTO invoice_details (invoice_id, product_id, quantity, unit_price, total_price)
-                            VALUES (?, ?, ?, ?, ?)
-                        """);
+                INSERT INTO invoice_details (invoice_id, product_id, quantity, unit_price, total_price)
+                VALUES (?, ?, ?, ?, ?)
+                """);
                 detailStmt.setInt(1, invoiceId);
-                detailStmt.setInt(2, product.getId());
+                detailStmt.setInt(2, productId);
                 detailStmt.setInt(3, quantity);
                 detailStmt.setBigDecimal(4, unitPrice);
                 detailStmt.setBigDecimal(5, totalPrice);
                 detailStmt.executeUpdate();
+                detailStmt.close();
 
                 PreparedStatement updateStockStmt = conn.prepareStatement("UPDATE products SET quantity = quantity - ? WHERE id = ?");
                 updateStockStmt.setInt(1, quantity);
-                updateStockStmt.setInt(2, product.getId());
+                updateStockStmt.setInt(2, productId);
                 updateStockStmt.executeUpdate();
+                updateStockStmt.close();
             }
 
             if (customerId != null) {
@@ -186,8 +216,16 @@ public class SaleService {
                 updateCustomer.setBigDecimal(1, finalTotal);
                 updateCustomer.setInt(2, customerId);
                 updateCustomer.executeUpdate();
+                updateCustomer.close();
             }
             conn.commit();
+
+            try {
+                PdfUtils.generateInvoicePDF("invoice.pdf", cart, total, discountPercent, finalTotal, paymentMethod, note, customerName, phoneNumber);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             return finalTotal;
 
         } catch (SQLException e) {
@@ -207,6 +245,8 @@ public class SaleService {
 
         return BigDecimal.ZERO;
     }
+
+
 
     public Customer findByPhone(String phone) {
         String sql = "SELECT * FROM customers WHERE phone = ?";

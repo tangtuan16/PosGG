@@ -11,8 +11,6 @@ import java.util.*;
 
 public class InvoiceService {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     public List<Invoice> search(String keyword, String fromDateStr, String toDateStr) {
         List<Invoice> list = new ArrayList<>();
         String sql = "SELECT i.*, c.name AS customer_name, c.phone AS customer_phone, u.name AS staff_name " +

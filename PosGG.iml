@@ -10,5 +10,7 @@
     <orderEntry type="library" name="mysql-connector-j-9.3.0" level="project" />
     <orderEntry type="library" name="itextpdf-5.5.9" level="project" />
     <orderEntry type="library" name="jcalendar-1.4" level="project" />
+    <orderEntry type="library" name="jakarta.mail-2.0.1" level="project" />
+    <orderEntry type="library" name="jakarta.activation-2.0.1" level="project" />
   </component>
 </module>

@@ -67,9 +67,4 @@ public class Customer {
         this.address = address;
     }
 
-    public int getDiscountPercent() {
-        if (totalBill == null) return 0;
-        int percent = totalBill.divide(BigDecimal.valueOf(1_000_000), 0, java.math.RoundingMode.FLOOR).intValue();
-        return Math.min(percent, 10);
-    }
 }

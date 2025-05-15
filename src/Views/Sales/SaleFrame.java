@@ -83,13 +83,16 @@ public class SaleFrame extends JFrame {
 
         productTable.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                int row = productTable.getSelectedRow();
-                Product product = saleController.getProductById((int) productModel.getValueAt(row, 0));
-                if (product.getQuantity() <= 0) {
-                    JOptionPane.showMessageDialog(productTable, "Sản phẩm đã hết hàng!");
-                    return;
+                int viewRow = productTable.getSelectedRow();
+                if (viewRow >= 0) {
+                    int modelRow = productTable.convertRowIndexToModel(viewRow);
+                    Product product = saleController.getProductById((int) productModel.getValueAt(modelRow, 0));
+                    if (product.getQuantity() <= 0) {
+                        JOptionPane.showMessageDialog(SaleFrame.this, "Sản phẩm đã hết hàng!");
+                        return;
+                    }
+                    addToCart(product);
                 }
-                addToCart(product);
             }
         });
     }
@@ -268,8 +271,35 @@ public class SaleFrame extends JFrame {
         int staffId = 1;
         String paymentMethod = "Cash";
         String note = "Cảm ơn khách hàng !";
-
         BigDecimal finalAmount = saleController.checkout(phoneNumber, paymentMethod, note, staffId, customerName);
+        String invoicePath = "invoice.pdf";
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có muốn gửi hóa đơn qua email không?",
+                "Gửi hóa đơn",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            String inputEmail = JOptionPane.showInputDialog(
+                    this,
+                    "Nhập địa chỉ email để gửi hóa đơn:",
+                    "Nhập Email",
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (inputEmail != null && !inputEmail.trim().isEmpty()) {
+                boolean success = saleController.sendInvoiceToEmail(inputEmail.trim(), finalAmount, invoicePath);
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Đã gửi hóa đơn đến email: " + inputEmail);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Gửi email thất bại! Vui lòng kiểm tra lại địa chỉ email.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Email không được để trống, không gửi hóa đơn.");
+            }
+
+        }
         cartModel.setRowCount(0);
         saleController.clearCart();
         loadProducts(searchField.getText());
