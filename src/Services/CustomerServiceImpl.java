@@ -3,6 +3,8 @@ package Services;
 import Models.Customer;
 import Services.Impl.CustomerService;
 import Utils.DBConnection;
+
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,9 @@ public class CustomerServiceImpl implements CustomerService {
         ResultSet rs = pstmt.executeQuery();
         while (rs.next()) {
             Customer customer = new Customer();
-            customer.setId(rs.getLong("id"));
+            customer.setId((int) rs.getLong("id"));
             customer.setName(rs.getString("name"));
-            customer.setTotalBill(rs.getDouble("total_bill"));
+            customer.setTotalBill(BigDecimal.valueOf(rs.getDouble("total_bill")));
             customer.setPhone(rs.getString("phone"));
             customer.setAddress(rs.getString("address"));
             customers.add(customer);
@@ -54,7 +56,7 @@ public class CustomerServiceImpl implements CustomerService {
             String insertSql = "INSERT INTO customers (name, total_bill, phone, address) VALUES (?, ?, ?, ?)";
             insertStmt = conn.prepareStatement(insertSql);
             insertStmt.setString(1, customer.getName());
-            insertStmt.setDouble(2, customer.getTotalBill());
+            insertStmt.setBigDecimal(2, customer.getTotalBill());
             insertStmt.setString(3, customer.getPhone());
             insertStmt.setString(4, customer.getAddress());
             insertStmt.executeUpdate();
@@ -81,7 +83,7 @@ public class CustomerServiceImpl implements CustomerService {
             String sql = "UPDATE customers SET name = ?, total_bill = ?, phone = ?, address = ? WHERE id = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, customer.getName());
-            pstmt.setDouble(2, customer.getTotalBill());
+            pstmt.setBigDecimal(2, customer.getTotalBill());
             pstmt.setString(3, customer.getPhone());
             pstmt.setString(4, customer.getAddress());
             pstmt.setLong(5, customer.getId());

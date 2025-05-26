@@ -1,22 +1,44 @@
 package Models;
 
-public class Customer {
+import java.math.BigDecimal;
 
-    private long id;
+public class Customer {
+    private int id;
     private String name;
-    private double totalBill;
+    private BigDecimal totalBill;
     private String phone;
     private String address;
 
+    public Customer(int id, String name, BigDecimal totalBill, String phone, String address) {
+        this.id = id;
+        this.name = name;
+        this.totalBill = totalBill;
+        this.phone = phone;
+        this.address = address;
+    }
 
-    public long getId() {
+    public Customer(String name, String phone, String address) {
+        this.name = name;
+        this.phone = phone;
+        this.address = address;
+        this.totalBill = BigDecimal.ZERO;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
+    public BigDecimal getTotalBill() {
+        return totalBill;
+    }
+
+    public void setTotalBill(BigDecimal totalBill) {
+        this.totalBill = totalBill;
+    }
 
     public String getName() {
         return name;
@@ -26,16 +48,6 @@ public class Customer {
         this.name = name;
     }
 
-
-    public double getTotalBill() {
-        return totalBill;
-    }
-
-    public void setTotalBill(double totalBill) {
-        this.totalBill = totalBill;
-    }
-
-
     public String getPhone() {
         return phone;
     }
@@ -44,20 +56,11 @@ public class Customer {
         this.phone = phone;
     }
 
-
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Customer(long id, String name, String phone, double totalBill, String address) {
-        this.id = id;
-        this.name = name;
-        this.phone = phone;
-        this.totalBill = totalBill;
         this.address = address;
     }
 

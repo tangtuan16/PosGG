@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +123,7 @@ public class CustomerController {
 
                         Customer customer = new Customer();
                         customer.setName(name);
-                        customer.setTotalBill(totalBill);
+                        customer.setTotalBill(BigDecimal.valueOf(totalBill));
                         customer.setPhone(phone);
                         customer.setAddress(address);
                         newCustomers.add(customer);
@@ -310,7 +311,7 @@ public class CustomerController {
                     // Tạo đối tượng khách hàng
                     Customer newCustomer = new Customer();
                     newCustomer.setName(name);
-                    newCustomer.setTotalBill(totalBill);
+                    newCustomer.setTotalBill(BigDecimal.valueOf(totalBill));
                     newCustomer.setPhone(phone);
                     newCustomer.setAddress(address);
 
@@ -350,7 +351,7 @@ public class CustomerController {
         String currentAddress = (String) view.getCustomerTable().getValueAt(selectedRow, 4);
 
         // Loại bỏ định dạng "vnđ" khỏi totalBill
-        currentTotalBill = currentTotalBill.replace(" vnđ", "").replace(",", "");
+        currentTotalBill = currentTotalBill.replace("VND", "").replace(",", "");
 
         JDialog editDialog = new JDialog(view, "Sửa thông tin khách hàng", true);
         editDialog.setSize(400, 300);
@@ -412,9 +413,9 @@ public class CustomerController {
                     }
 
                     Customer updatedCustomer = new Customer();
-                    updatedCustomer.setId(customerId);
+                    updatedCustomer.setId((int) customerId);
                     updatedCustomer.setName(name);
-                    updatedCustomer.setTotalBill(totalBill);
+                    updatedCustomer.setTotalBill(BigDecimal.valueOf(totalBill));
                     updatedCustomer.setPhone(phone);
                     updatedCustomer.setAddress(address);
 
@@ -498,7 +499,7 @@ public class CustomerController {
             }
 
             DefaultTableModel tableModel = (DefaultTableModel) view.getCustomerTable().getModel();
-            DecimalFormat df = new DecimalFormat("#,###.## vnđ");
+            DecimalFormat df = new DecimalFormat("#,###.## VND");
 
             tableModel.setRowCount(0);
 

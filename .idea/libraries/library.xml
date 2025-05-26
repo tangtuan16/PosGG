@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="library">
+    <CLASSES>
+      <root url="file://$USER_HOME$/OneDrive/Máy tính/library" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$USER_HOME$/OneDrive/Máy tính/library/doc/api" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file://$USER_HOME$/OneDrive/Máy tính/library/src" />
+      <root url="file://$USER_HOME$/OneDrive/Máy tính/library" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/OneDrive/Máy tính/library" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/OneDrive/Máy tính/library" recursive="false" type="SOURCES" />
+  </library>
+</component>
