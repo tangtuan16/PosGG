@@ -1,5 +1,12 @@
+
+import Views.Customer.CustomerFrame;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        // Khởi chạy giao diện CustomerFrame
+        System.out.println("DB_USER " + System.getenv("DB_USER"));
+        java.awt.EventQueue.invokeLater(() -> {
+            new CustomerFrame().setVisible(true);
+        });
     }
 }
