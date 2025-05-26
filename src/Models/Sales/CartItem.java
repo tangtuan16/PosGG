@@ -3,6 +3,7 @@ package Models.Sales;
 import Models.Product;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class CartItem {
     private Product product;
@@ -22,8 +23,14 @@ public class CartItem {
     }
 
     public BigDecimal getTotalPrice() {
-        return product.getSellingPrice().multiply(BigDecimal.valueOf(quantity));
+        BigDecimal discountPercent = product.getDiscount() == null ? BigDecimal.ZERO : product.getDiscount();
+        BigDecimal discountedPrice = product.getSellingPrice()
+                .multiply(BigDecimal.ONE.subtract(discountPercent.divide(BigDecimal.valueOf(100))))
+                .setScale(2, RoundingMode.HALF_UP);
+        return discountedPrice.multiply(BigDecimal.valueOf(quantity))
+                .setScale(2, RoundingMode.HALF_UP);
     }
+
 
     public void setProduct(Product product) {
         this.product = product;

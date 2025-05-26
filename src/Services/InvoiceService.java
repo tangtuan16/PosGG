@@ -1,9 +1,11 @@
 package Services;
 
+import Models.Customer;
 import Models.Sales.Invoice;
 import Models.Sales.InvoiceItem;
 import Utils.DBConnection;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,7 +13,7 @@ import java.util.*;
 
 public class InvoiceService {
 
-    public List<Invoice> search(String keyword, String fromDateStr, String toDateStr) {
+    public List<Invoice> searchInvoices(String keyword, String fromDateStr, String toDateStr) {
         List<Invoice> list = new ArrayList<>();
         String sql = "SELECT i.*, c.name AS customer_name, c.phone AS customer_phone, u.name AS staff_name " +
                 "FROM invoices i " +
@@ -72,15 +74,18 @@ public class InvoiceService {
 
     public List<InvoiceItem> getInvoiceItems(int invoiceId) {
         List<InvoiceItem> items = new ArrayList<>();
-        String sql = "SELECT d.product_id, p.name as product_name, d.quantity, d.unit_price, d.total_price " +
-                "FROM invoice_details d " +
-                "JOIN products p ON d.product_id = p.id " +
-                "WHERE d.invoice_id = ?";
 
-        try (
-                Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        String sql = """
+                    SELECT d.product_id, p.name AS product_name,
+                           d.quantity, d.unit_price, d.total_price
+                    FROM invoice_details d
+                    JOIN products p ON d.product_id = p.id
+                    WHERE d.invoice_id = ?
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, invoiceId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -100,5 +105,53 @@ public class InvoiceService {
         }
 
         return items;
+    }
+
+    public Customer getCustomerByInvoicesId(int invoiceId) {
+        String sql = "SELECT c.id, c.name, c.phone, i.discount " +
+                "FROM invoices i " +
+                "JOIN customers c ON i.customer_id = c.id " +
+                "WHERE i.id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, invoiceId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Customer customer = new Customer();
+                customer.setId(rs.getInt("id"));
+                customer.setName(rs.getString("name"));
+                customer.setPhone(rs.getString("phone"));
+                BigDecimal discount = rs.getBigDecimal("discount");
+
+                return customer;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public BigDecimal getDiscountByInvoiceId(int invoiceId) {
+        String sql = "SELECT discount FROM invoices WHERE id = ?";
+        BigDecimal discount = BigDecimal.ZERO;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, invoiceId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                discount = rs.getBigDecimal("discount");
+                return discount;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 }
