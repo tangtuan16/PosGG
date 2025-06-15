@@ -1,5 +1,6 @@
 package Controllers;
 
+import DTO.CheckoutResult;
 import Models.Product;
 import Models.Sales.CartItem;
 import Services.SaleService;
@@ -24,7 +25,7 @@ public class SaleController {
 
     public void loadProducts(String keyword, int page, int pageSize) {
         try {
-            List<Product> products = saleService.loadProducts(keyword, page, pageSize);
+            List<Product> products = saleService.getProducts(keyword, page, pageSize);
             view.displayProducts(products, page, pageSize);
         } catch (SaleService.SaleServiceException e) {
             JOptionPane.showMessageDialog(view, "Lỗi tải sản phẩm: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -33,7 +34,7 @@ public class SaleController {
 
     public void getProductSuggestions(String keyword) {
         try {
-            List<Product> suggestions = saleService.findByKeys(keyword, 1, 10);
+            List<Product> suggestions = saleService.getProducts(keyword, 1, 10);
             view.displaySuggestions(suggestions);
         } catch (SaleService.SaleServiceException e) {
             JOptionPane.showMessageDialog(view, "Lỗi tải gợi ý sản phẩm: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -120,10 +121,10 @@ public class SaleController {
 
     public void checkout(String phoneNumber, String paymentMethod, String note, int staffId, String customerName) {
         try {
-            BigDecimal finalAmount = saleService.checkout(phoneNumber, staffId, paymentMethod, note, customerName);
+            CheckoutResult result = saleService.checkout(phoneNumber, staffId, paymentMethod, note, customerName);
             view.clearCart();
             view.updateCustomerInfo("", BigDecimal.ZERO);
-            JOptionPane.showMessageDialog(view, "Thanh toán thành công! Tổng tiền: " + FormatVND.format(finalAmount), "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Thanh toán thành công! Tổng tiền: " + FormatVND.format(result.getFinalTotal()), "Thành công", JOptionPane.INFORMATION_MESSAGE);
         } catch (SaleService.SaleServiceException e) {
             JOptionPane.showMessageDialog(view, "Lỗi thanh toán: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }

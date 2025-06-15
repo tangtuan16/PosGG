@@ -43,12 +43,14 @@ public class InvoiceSearchFrame extends JFrame {
 
         searchPanel.add(new JLabel("Từ ngày (dd/MM/yyyy):"));
         dateChooserFrom = new JDateChooser();
+        dateChooserFrom.setPreferredSize(new Dimension(200, 20));
         dateChooserFrom.setDateFormatString("dd/MM/yyyy");
         dateChooserFrom.setFont(new Font("Arial", Font.PLAIN, 14));
         searchPanel.add(dateChooserFrom);
 
         searchPanel.add(new JLabel("Đến ngày (dd/MM/yyyy):"));
         dateChooserTo = new JDateChooser();
+        dateChooserTo.setPreferredSize(new Dimension(200, 20));
         dateChooserTo.setDateFormatString("dd/MM/yyyy");
         dateChooserTo.setFont(new Font("Arial", Font.PLAIN, 14));
         searchPanel.add(dateChooserTo);
@@ -58,7 +60,7 @@ public class InvoiceSearchFrame extends JFrame {
         searchPanel.add(btnSearch);
 
         btnReset = new JButton("Làm mới");
-        styleButton(btnReset, new Color(40,167,69));
+        styleButton(btnReset, PRIMARY_BUTTON_COLOR);
         searchPanel.add(btnReset);
 
         add(searchPanel, BorderLayout.NORTH);

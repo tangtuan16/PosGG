@@ -20,7 +20,7 @@ public class InvoiceDetailDialog extends JDialog {
         setSize(650, 460);
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout(10, 10));
-        JLabel lblCustomer = new JLabel("Khách hàng: " + customer == null ? customer.getName() : "Khách lẻ");
+        JLabel lblCustomer = new JLabel("Khách hàng: " + (customer != null ? customer.getName() : "Khách lẻ"));
         lblCustomer.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblCustomer.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(lblCustomer, BorderLayout.NORTH);

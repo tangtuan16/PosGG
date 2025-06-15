@@ -1,5 +1,6 @@
 package Services;
 
+import DTO.CheckoutResult;
 import Models.Sales.CartItem;
 import Models.Customer;
 import Models.Product;
@@ -31,7 +32,7 @@ public class SaleService {
         this.emailService = new EmailService();
     }
 
-    public List<Product> loadProducts(String keyword, int page, int size) {
+    public List<Product> getProducts(String keyword, int page, int size) {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM products WHERE (name LIKE ? OR barcode LIKE ?) AND status = 'active' LIMIT ? OFFSET ?";
 
@@ -50,31 +51,6 @@ public class SaleService {
             }
         } catch (SQLException e) {
             throw new SaleServiceException("Failed to retrieve products: " + e.getMessage(), e);
-        }
-
-        return products;
-    }
-
-    public List<Product> findByKeys(String keyword, int page, int size) {
-        List<Product> products = new ArrayList<>();
-        String sql = "SELECT * FROM products WHERE (LOWER(name) LIKE ? OR LOWER(barcode)) AND status = 'actvie' LIKE ? LIMIT ? OFFSET ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            String pattern = "%" + keyword.toLowerCase() + "%";
-            stmt.setString(1, pattern);
-            stmt.setString(2, pattern);
-            stmt.setInt(3, size);
-            stmt.setInt(4, (page - 1) * size);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    products.add(createProductFromResultSet(rs));
-                }
-            }
-        } catch (SQLException e) {
-            throw new SaleServiceException("Failed to retrieve product suggestions: " + e.getMessage(), e);
         }
 
         return products;
@@ -157,16 +133,16 @@ public class SaleService {
         return discountedPrice.multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal checkout(String phoneNumber, int staffId, String paymentMethod, String note, String customerName) {
+    public CheckoutResult checkout(String phoneNumber, int staffId, String paymentMethod, String note, String customerName) {
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 int[] invoiceIdHolder = new int[1];
-                BigDecimal finalTotal = processCheckout(conn, phoneNumber, staffId, paymentMethod, note, customerName, invoiceIdHolder);
+                CheckoutResult result = processCheckout(conn, phoneNumber, staffId, paymentMethod, note, customerName, invoiceIdHolder);
                 conn.commit();
-                generateInvoicePDF(cart, invoiceIdHolder[0], finalTotal, getCustomerDiscountPercent(phoneNumber), phoneNumber, paymentMethod, note, customerName);
+                generateInvoicePDF(cart, result.getInvoiceId(), result.getFinalTotal(), result.getDiscountPercent(), phoneNumber, paymentMethod, note, customerName);
                 this.cart.clear();
-                return finalTotal;
+                return result;
             } catch (SQLException | IOException e) {
                 conn.rollback();
                 throw new SaleServiceException("Thanh toán thất bại: " + e.getMessage(), e);
@@ -176,7 +152,7 @@ public class SaleService {
         }
     }
 
-    private BigDecimal processCheckout(Connection conn, String phoneNumber, int staffId, String paymentMethod, String note, String customerName, int[] invoiceIdHolder) throws SQLException {
+    private CheckoutResult processCheckout(Connection conn, String phoneNumber, int staffId, String paymentMethod, String note, String customerName, int[] invoiceIdHolder) throws SQLException {
         // Kiểm tra giỏ hàng
         if (cart.isEmpty()) {
             throw new SaleServiceException("Giỏ hàng rỗng, không thể thanh toán", null);
@@ -229,7 +205,7 @@ public class SaleService {
             updateCustomerTotalBill(conn, customerId, finalTotal);
         }
 
-        return finalTotal;
+        return new CheckoutResult(finalTotal, discountPercent, invoiceIdHolder[0]);
     }
 
     private int insertInvoice(Connection conn, Integer customerId, int staffId, BigDecimal total, BigDecimal discountPercent, BigDecimal finalTotal, String note, String paymentMethod) throws SQLException {
@@ -425,7 +401,7 @@ public class SaleService {
                     scanning = false;
                     return result.getText();
                 } catch (NotFoundException e) {
-
+                    e.getMessage();
                 }
 
                 Thread.sleep(100);

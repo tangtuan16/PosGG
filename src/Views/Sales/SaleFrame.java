@@ -33,9 +33,6 @@ public class SaleFrame extends JFrame {
     private static final Color PRIMARY_BUTTON_COLOR = new Color(0, 123, 255);
     private static final Color PAGINATION_BUTTON_COLOR = new Color(108, 117, 125);
 
-    // controler er = new Controll();
-   // er.show();
-    // dung static: k can khoi tao -> goi truc tiep
     private JTable cartTable, productTable;
     private DefaultTableModel cartModel, productModel;
     private JTextField searchField;
@@ -50,7 +47,7 @@ public class SaleFrame extends JFrame {
     private AWTEventListener clickOutsideListener;
     private int currentPage = 1;
     private final int pageSize = 20;
-    private JButton prevButton, nextButton, scanButton;
+    private JButton prevButton, nextButton, scanButton, stopScanButton;
     private final SaleController controller;
 
     public SaleFrame() {
@@ -128,8 +125,9 @@ public class SaleFrame extends JFrame {
             if (webcam.isOpen()) {
                 webcam.close();
             }
-
-            webcam.setViewSize(new Dimension(176, 144));
+            Dimension d = new Dimension(176, 144);
+            webcam.setViewSize(d);
+            stopScanButton.setVisible(true);
             webcamPanel = new WebcamPanel(webcam);
             searchPanel.add(webcamPanel, BorderLayout.CENTER);
             searchPanel.revalidate();
@@ -150,13 +148,15 @@ public class SaleFrame extends JFrame {
                         }
                         searchPanel.revalidate();
                         searchPanel.repaint();
+                        stopScanButton.setVisible(false);
                     });
                 }
             });
         });
 
         searchPanel.add(scanButton);
-        JButton stopScanButton = new JButton("Dừng quét");
+        stopScanButton = new JButton("Dừng quét");
+        stopScanButton.setVisible(false);
         styleButton(stopScanButton, new Color(244, 67, 54));
         stopScanButton.addActionListener(e -> {
             controller.stopBarcodeScanner();
@@ -169,12 +169,13 @@ public class SaleFrame extends JFrame {
                 searchPanel.revalidate();
                 searchPanel.repaint();
             }
+            stopScanButton.setVisible(false);
         });
 
         searchPanel.add(stopScanButton);
 
         JButton invoicesButton = new JButton("Check hóa đơn");
-        styleButton(invoicesButton, new Color(40, 167, 69));
+        styleButton(invoicesButton, PRIMARY_BUTTON_COLOR);
         invoicesButton.addActionListener(e -> new InvoiceSearchFrame().setVisible(true));
         searchPanel.add(invoicesButton);
 
