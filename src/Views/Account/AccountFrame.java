@@ -1,4 +1,6 @@
 package Views.Account;
 
-public class AccountFrame {
+import javax.swing.*;
+
+public class AccountFrame extends JFrame {
 }

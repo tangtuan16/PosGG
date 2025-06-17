@@ -340,13 +340,17 @@ public class SaleService {
         }
     }
 
-    public String buildInvoiceEmailContent(String emai) {
-        return "<h2>Hóa đơn mua hàng</h2>" +
-                "<p>Xin chào khách hàng,</p>" +
-                "<p>Cảm ơn bạn đã mua hàng tại cửa hàng chúng tôi.</p>" +
-                "<p>Chúng tôi rất mong được phục vụ bạn lần sau!</p>" +
-                "<br><p>Trân trọng,</p>" +
-                "<p>Đội ngũ PosGG</p>";
+    public String buildInvoiceEmailContent(String email) {
+        return """
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; background-color: #fafafa;">
+            <h2 style="color: #2c3e50; text-align: center;">Hoá đơn <span style="color: #4CAF50;">POSGG</span></h2>
+            <p>Xin chào,</p>
+            <p>Cảm ơn bạn đã tin tưởng và lựa chọn PosGG. Chúc bạn có trải nghiệm mua sắm vui vẻ!</p>
+            <p style="margin-top: 40px;">Trân trọng,<br><strong>Đội ngũ PosGG</strong></p>
+            <hr style="margin-top: 40px;">
+            <p style="font-size: 12px; color: #999999; text-align: center;">Email này được gửi tự động, vui lòng không trả lời.</p>
+        </div>
+        """;
     }
 
     public BigDecimal getCustomerDiscountPercent(String phone) {
@@ -425,4 +429,6 @@ public class SaleService {
             super(message, cause);
         }
     }
+
+
 }

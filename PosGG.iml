@@ -18,5 +18,6 @@
     <orderEntry type="library" name="slf4j-api-2.0.9" level="project" />
     <orderEntry type="library" name="core-3.5.1" level="project" />
     <orderEntry type="library" name="javase-3.5.1" level="project" />
+    <orderEntry type="library" name="vlcj-5.0.0-M4" level="project" />
   </component>
 </module>

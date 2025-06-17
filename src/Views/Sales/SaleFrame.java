@@ -401,7 +401,6 @@ public class SaleFrame extends JFrame {
             String paymentMethod = (String) paymentComboBox.getSelectedItem();
             String note = "Cảm ơn khách hàng!";
             controller.checkout(phoneNumber, paymentMethod, note, staffId, customerName);
-
             int choice = JOptionPane.showConfirmDialog(
                     this,
                     "Bạn có muốn gửi hóa đơn qua email không?",
@@ -424,6 +423,7 @@ public class SaleFrame extends JFrame {
                     }
                     BigDecimal totalAmount = controller.getCartTotal();
                     controller.sendInvoiceToEmail(inputEmail.trim(), totalAmount, "invoice.pdf");
+                    productModel.fireTableDataChanged();
                 }
             }
         });
@@ -584,6 +584,8 @@ public class SaleFrame extends JFrame {
             phoneField.setText("");
             updateCustomerInfo("", BigDecimal.ZERO);
             updateCartSummary();
+            controller.loadProducts("", currentPage, pageSize);
+            productModel.fireTableDataChanged();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Lỗi xóa giỏ hàng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }

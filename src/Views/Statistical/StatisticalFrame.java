@@ -1,4 +1,6 @@
 package Views.Statistical;
 
-public class StatisticalFrame {
+import javax.swing.*;
+
+public class StatisticalFrame extends JFrame {
 }
