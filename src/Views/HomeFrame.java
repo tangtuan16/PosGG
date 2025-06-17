@@ -1,6 +1,7 @@
 package Views;
 
 import Utils.FrameManager;
+import Views.Auth.LoginFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,6 +93,6 @@ public class HomeFrame extends JFrame {
         dispose();
         FrameManager.closeAll();
         JOptionPane.showMessageDialog(this, "Bạn đã đăng xuất!");
-       // SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }
