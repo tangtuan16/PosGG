@@ -83,9 +83,10 @@ public class UserService {
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("username"),
+                        rs.getString("password_hash"),
                         rs.getString("role"),
-                        rs.getString("status"),
-                        rs.getString("password_hash")
+                        rs.getString("status")
+
                 ));
             }
         } catch (Exception e) {
@@ -97,6 +98,7 @@ public class UserService {
     public boolean updateUserInfo(User user) {
         try {
             Connection conn = DBConnection.getConnection();
+            System.out.println("User updated: " + user.getId());
             String sql = "UPDATE users SET username=?, name=?, role=?, status=? WHERE id=?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, user.getUsername());

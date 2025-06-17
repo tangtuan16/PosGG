@@ -81,7 +81,7 @@ public class AccountFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(infoPanel, gbc);
 
-        model = new DefaultTableModel(new String[]{"ID", "Username", "Name", "Role", "Status"}, 0) {
+        model = new DefaultTableModel(new String[]{"ID", "Name", "Username", "Pass", "Role", "Status"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -123,8 +123,9 @@ public class AccountFrame extends JFrame {
         for (User user : users) {
             model.addRow(new Object[]{
                     user.getId(),
-                    user.getUsername(),
                     user.getName(),
+                    user.getUsername(),
+                    user.getPassword(),
                     user.getRole(),
                     user.getStatus()
             });
@@ -135,10 +136,10 @@ public class AccountFrame extends JFrame {
         int selected = table.getSelectedRow();
         if (selected >= 0) {
             idField.setText(model.getValueAt(selected, 0).toString());
-            usernameField.setText(model.getValueAt(selected, 1).toString());
-            nameField.setText(model.getValueAt(selected, 2).toString());
-            roleCombo.setSelectedItem(model.getValueAt(selected, 3).toString());
-            statusCombo.setSelectedItem(model.getValueAt(selected, 4).toString());
+            nameField.setText(model.getValueAt(selected, 1).toString());
+            usernameField.setText(model.getValueAt(selected, 2).toString());
+            roleCombo.setSelectedItem(model.getValueAt(selected, 4).toString());
+            statusCombo.setSelectedItem(model.getValueAt(selected, 5).toString());
         }
     }
 
@@ -152,7 +153,7 @@ public class AccountFrame extends JFrame {
             String status = statusCombo.getSelectedItem().toString();
             String password = Session.getInstance().getUser().getPassword();
 
-            User user = new User(id, name, username, role, status, password);
+            User user = new User(id, name, username, password, role, status);
             if (controller.updateUserInfo(user)) {
                 JOptionPane.showMessageDialog(this, "User updated");
                 loadData();

@@ -1,6 +1,6 @@
 package Utils;
 
-import Views.Account.AccountFrame;
+import Views.Auth.AccountFrame;
 import Views.Customer.CustomerFrame;
 import Views.Products.ProductsFrames;
 import Views.Sales.SaleFrame;

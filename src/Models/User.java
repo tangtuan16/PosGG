@@ -8,13 +8,13 @@ public class User {
     private String role;
     private String status;
 
-    public User(int id, String name, String username, String role, String status, String password) {
+    public User(int id, String name, String username, String password, String role, String status) {
         this.id = id;
         this.name = name;
         this.username = username;
+        this.password = password;
         this.role = role;
         this.status = status;
-        this.password = password;
     }
 
     public int getId() {
