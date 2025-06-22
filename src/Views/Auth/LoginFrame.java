@@ -1,6 +1,7 @@
 package Views.Auth;
 
 import Controllers.UserController;
+import Models.Session;
 import Views.HomeFrame;
 
 import javax.swing.*;
@@ -57,6 +58,7 @@ public class LoginFrame extends JFrame {
         String password = new String(passwordField.getPassword());
 
         if (controller.login(username, password)) {
+            System.out.println("pass" + Session.getInstance().getUser().getId());
             JOptionPane.showMessageDialog(this, "Login successful!");
             dispose();
             new HomeFrame().setVisible(true);

@@ -3,6 +3,9 @@ package Models;
 import java.math.BigDecimal;
 
 public class Product {
+    private String categoryName;
+    private String createdByUsername;
+    private String supplierName;
     private int id;
     private String name;
     private int categoryId;
@@ -11,7 +14,6 @@ public class Product {
     private BigDecimal sellingPrice;
     private int quantity;
     private String unit;
-    private String description;
     private String status;
     private String createdAt;
     private String updatedAt;
@@ -21,14 +23,16 @@ public class Product {
     private String image;
     private int minimumQuantity;
     private BigDecimal discount;
+    private String useByDate;
+
 
     public Product() {
     }
 
     public Product(int id, String name, int categoryId, int supplierId, BigDecimal originalPrice,
-                   BigDecimal sellingPrice, int quantity, String unit, String description, String status,
+                   BigDecimal sellingPrice, int quantity, String unit, String status,
                    String createdAt, String updatedAt, int createdBy, int updatedBy,
-                   String barcode, String image, int minimumQuantity, BigDecimal discount) {
+                   String barcode, String image, int minimumQuantity, BigDecimal discount, String useByDate) {
         this.id = id;
         this.name = name;
         this.categoryId = categoryId;
@@ -37,7 +41,6 @@ public class Product {
         this.sellingPrice = sellingPrice;
         this.quantity = quantity;
         this.unit = unit;
-        this.description = description;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -47,9 +50,71 @@ public class Product {
         this.image = image;
         this.minimumQuantity = minimumQuantity;
         this.discount = discount;
+        this.useByDate = useByDate;
+    }
+
+    public Product(int id, String name, int categoryId, int supplierId, BigDecimal originalPrice,
+                   BigDecimal sellingPrice, int quantity, String unit, String status,
+                   String createdAt, String updatedAt, int createdBy, int updatedBy,
+                   String barcode, String image, int minimumQuantity, BigDecimal discount,
+                   String useByDate, String categoryName, String supplierName, String createdByUsername) {
+        this.id = id;
+        this.name = name;
+        this.categoryId = categoryId;
+        this.supplierId = supplierId;
+        this.originalPrice = originalPrice;
+        this.sellingPrice = sellingPrice;
+        this.quantity = quantity;
+        this.unit = unit;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
+        this.barcode = barcode;
+        this.image = image;
+        this.minimumQuantity = minimumQuantity;
+        this.discount = discount;
+        this.useByDate = useByDate;
+        this.categoryName = categoryName;
+        this.supplierName = supplierName;
+        this.createdByUsername = createdByUsername;
     }
 
     // GETTERS & SETTERS
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getCreatedByUsername() {
+        return createdByUsername;
+    }
+
+    public void setCreatedByUsername(String createdByUsername) {
+        this.createdByUsername = createdByUsername;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getUseByDate() {
+        return useByDate;
+    }
+
+    public void setUseByDate(String useByDate) {
+        this.useByDate = useByDate;
+    }
+
     public int getId() {
         return id;
     }
@@ -112,14 +177,6 @@ public class Product {
 
     public void setUnit(String unit) {
         this.unit = unit;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getStatus() {

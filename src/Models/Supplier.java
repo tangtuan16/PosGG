@@ -11,12 +11,29 @@ public class Supplier {
     private int createdBy;
     private String updatedAt;
     private int updatedBy;
+    private String createdByName;
+    private String updatedByName;
 
-    // No-arg constructor
     public Supplier() {
     }
 
     // Constructor with all fields
+    public Supplier(int id, String name, String phone, String email, String address,
+                    String status, String createdAt, int createdBy, String updatedAt, int updatedBy,String createdByName, String updatedByName) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+        this.createdByName = createdByName;
+        this.updatedByName = updatedByName;
+    }
+
     public Supplier(int id, String name, String phone, String email, String address,
                     String status, String createdAt, int createdBy, String updatedAt, int updatedBy) {
         this.id = id;
@@ -32,6 +49,26 @@ public class Supplier {
     }
 
     // Getters and Setters
+    public String getUpdatedByName() {
+        return updatedByName;
+    }
+
+    public void setUpdatedByName(String updatedByName) {
+        this.updatedByName = updatedByName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getCreatedByName() {
+        return createdByName;
+    }
+
+    public void setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
+    }
+
     public int getId() {
         return id;
     }

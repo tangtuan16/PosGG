@@ -1,7 +1,5 @@
 package Models;
 
-import java.time.LocalDateTime;
-
 public class Category {
     private int id;
     private String name;
@@ -12,6 +10,9 @@ public class Category {
     private int parentId; // cho phép null nếu không có cha
     private int createdBy;
     private int updatedBy;
+    private String createdByUsername; // Tên người tạo
+    private String updatedByUsername; // Tên người cập nhật
+    private String parentName; // Thêm thuộc tính để lưu tên danh mục cha
 
     public Category() {
     }
@@ -30,7 +31,52 @@ public class Category {
         this.updatedBy = updatedBy;
     }
 
-    // --- Getter & Setter ---
+    public Category(int id, String name, String description, String status,
+                    String createdAt, String updatedAt,
+                    int parentId, int createdBy, int updatedBy,
+                    String createdByUsername, String updatedByUsername, String parentName) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.parentId = parentId;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
+        this.createdByUsername = createdByUsername;
+        this.updatedByUsername = updatedByUsername;
+        this.parentName = parentName;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getCreatedByUsername() {
+        return createdByUsername;
+    }
+
+    public void setCreatedByUsername(String createdByUsername) {
+        this.createdByUsername = createdByUsername;
+    }
+
+    public String getUpdatedByUsername() {
+        return updatedByUsername;
+    }
+
+    public void setUpdatedByUsername(String updatedByUsername) {
+        this.updatedByUsername = updatedByUsername;
+    }
+// --- Getter & Setter ---
 
     public int getId() {
         return id;

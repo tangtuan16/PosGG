@@ -2,14 +2,14 @@ package Utils;
 
 import Views.Auth.AccountFrame;
 import Views.Customer.CustomerFrame;
-import Views.Products.ProductsFrames;
+import Views.Products.ProductFrame;
 import Views.Sales.SaleFrame;
 import Views.Statistical.StatisticalFrame;
 
 public class FrameManager {
     private static AccountFrame accountFrame;
     private static CustomerFrame customerFrame;
-    private static ProductsFrames productsFrame;
+    private static ProductFrame productFrame;
     private static SaleFrame saleFrame;
     private static StatisticalFrame statFrame;
 
@@ -30,11 +30,11 @@ public class FrameManager {
     }
 
     public static void showProductsFrame() {
-        if (productsFrame == null || !productsFrame.isDisplayable()) {
-            productsFrame = new ProductsFrames();
+        if (productFrame == null || !productFrame.isDisplayable()) {
+            productFrame = new ProductFrame();
         }
-        productsFrame.setVisible(true);
-        productsFrame.toFront();
+        productFrame.setVisible(true);
+        productFrame.toFront();
     }
 
     public static void showSaleFrame() {
@@ -56,7 +56,7 @@ public class FrameManager {
     public static void closeAll() {
         if (accountFrame != null) accountFrame.dispose();
         if (customerFrame != null) customerFrame.dispose();
-        if (productsFrame != null) productsFrame.dispose();
+        if (productFrame != null) productFrame.dispose();
         if (saleFrame != null) saleFrame.dispose();
         if (statFrame != null) statFrame.dispose();
     }
