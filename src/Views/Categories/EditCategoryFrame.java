@@ -17,7 +17,7 @@ public class EditCategoryFrame extends JFrame {
     private int pd = 20;
     private CategoryController categoryController = new CategoryController();;
     public int userId = Session.getInstance().getUser().getId();
-    private CategoryFrame categoryFrame ;
+    private CategoryFrame categoryFrame;
     private JButton editButton;
     private JTextField nameField;
     private JTextArea descriptionField;
