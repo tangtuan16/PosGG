@@ -9,9 +9,6 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -25,29 +22,25 @@ public class CustomerController {
     private final int pageSize = 5;
     private String currentKeyword = "";
     private String currentSortType = "Mặc định";
-    private boolean isSearchMessageShown = false; // Biến kiểm soát thông báo tìm kiếm
+    private boolean isSearchMessageShown = false;
 
     public CustomerController(CustomerFrame view, CustomerService customerService) {
         this.view = view;
         this.customerService = customerService;
 
-        // Gắn sự kiện cho các nút trong View
         setupButtonListeners();
         setupSearchListener();
         setupSortListener();
         setupPaginationListeners();
-        updateTable(); // Tải trang đầu tiên khi khởi tạo
+        updateTable();
     }
 
     private void setupButtonListeners() {
-        // Gắn sự kiện cho nút Thêm
-        view.getAddButton().addActionListener(e -> showAddCustomerDialog());
-
-        // Có thể thêm các sự kiện khác (Sửa, Xóa, v.v.) ở đây\
-        view.getEditButton().addActionListener(e -> showEditCustomerDialog());
+        view.getAddButton().addActionListener(e -> view.showAddCustomerDialog());
+        view.getEditButton().addActionListener(e -> view.showEditCustomerDialog());
         view.getDeleteButton().addActionListener(e -> deleteCustomers());
         view.getImportExcelButton().addActionListener(e -> importCSV());
-        view.getExportExcelButton().addActionListener(e ->  exportCSV());
+        view.getExportExcelButton().addActionListener(e -> exportCSV());
     }
 
     private void setupSearchListener() {
@@ -59,7 +52,6 @@ public class CustomerController {
     }
 
     private boolean isValidPhoneNumber(String phone) {
-        // Kiểm tra số điện thoại: đúng 10 chữ số, chỉ chứa số
         return phone != null && phone.matches("\\d{10}");
     }
 
@@ -69,6 +61,69 @@ public class CustomerController {
         currentSortType = "Mặc định";
         view.getSortComboBox().setSelectedIndex(0);
         view.getSearchField().setText("Nhập nội dung tìm kiếm...");
+        updateTable();
+    }
+
+    // New method: Handle adding a customer
+    public void addCustomer(String name, String totalBillText, String phone, String address, JDialog dialog) {
+        if (name.isEmpty() || totalBillText.isEmpty() || phone.isEmpty() || address.isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng điền đầy đủ thông tin!");
+        }
+
+        double totalBill;
+        try {
+            totalBill = Double.parseDouble(totalBillText);
+            if (totalBill < 0) {
+                throw new IllegalArgumentException("Tổng đã dùng phải là số không âm!");
+            }
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Tổng đã dùng phải là số hợp lệ!");
+        }
+
+        if (!isValidPhoneNumber(phone)) {
+            throw new IllegalArgumentException("Số điện thoại phải có đúng 10 chữ số!");
+        }
+
+        Customer newCustomer = new Customer();
+        newCustomer.setName(name);
+        newCustomer.setTotalBill(BigDecimal.valueOf(totalBill));
+        newCustomer.setPhone(phone);
+        newCustomer.setAddress(address);
+
+        customerService.insertCustomer(newCustomer);
+        JOptionPane.showMessageDialog(dialog, "Thêm khách hàng thành công!");
+        updateTable();
+    }
+
+    // New method: Handle editing a customer
+    public void editCustomer(long customerId, String name, String totalBillText, String phone, String address, JDialog dialog) {
+        if (name.isEmpty() || totalBillText.isEmpty() || phone.isEmpty() || address.isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng điền đầy đủ thông tin!");
+        }
+
+        double totalBill;
+        try {
+            totalBill = Double.parseDouble(totalBillText);
+            if (totalBill < 0) {
+                throw new IllegalArgumentException("Tổng đã dùng phải là số không âm!");
+            }
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Tổng đã dùng phải là số hợp lệ!");
+        }
+
+        if (!isValidPhoneNumber(phone)) {
+            throw new IllegalArgumentException("Số điện thoại phải có đúng 10 chữ số!");
+        }
+
+        Customer updatedCustomer = new Customer();
+        updatedCustomer.setId((int) customerId);
+        updatedCustomer.setName(name);
+        updatedCustomer.setTotalBill(BigDecimal.valueOf(totalBill));
+        updatedCustomer.setPhone(phone);
+        updatedCustomer.setAddress(address);
+
+        customerService.updateCustomer(updatedCustomer);
+        JOptionPane.showMessageDialog(dialog, "Cập nhật khách hàng thành công!");
         updateTable();
     }
 
@@ -91,7 +146,6 @@ public class CustomerController {
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             try (CSVReader csvReader = new CSVReader(new FileReader(selectedFile))) {
-                // Đọc dòng tiêu đề (header)
                 String[] headers = null;
                 try {
                     headers = csvReader.readNext();
@@ -110,7 +164,6 @@ public class CustomerController {
                 while ((row = csvReader.readNext()) != null) {
                     rowNum++;
                     try {
-                        // Bỏ qua cột ID (vì ID sẽ được tự động sinh bởi CustomerServiceImpl)
                         String name = row[1].trim();
                         double totalBill = Double.parseDouble(row[2].trim());
                         String phone = row[3].trim();
@@ -182,14 +235,10 @@ public class CustomerController {
                     new FileOutputStream(selectedFile), "UTF-8");
                  CSVWriter csvWriter = new CSVWriter(writer)) {
 
-                // Ghi BOM để Excel nhận đúng UTF-8
                 writer.write('\uFEFF');
-
-                // Ghi dòng tiêu đề
                 String[] tieuDe = {"Mã KH", "Tên khách hàng", "Tổng đã chi", "Số điện thoại", "Địa chỉ"};
                 csvWriter.writeNext(tieuDe);
 
-                // Ghi dữ liệu
                 for (Customer khachHang : danhSachKhachHang) {
                     String[] dong = {
                             String.valueOf(khachHang.getId()),
@@ -242,197 +291,6 @@ public class CustomerController {
         return (int) Math.ceil((double) totalRecords / pageSize);
     }
 
-    private void showAddCustomerDialog() {
-        // Tạo dialog để nhập thông tin khách hàng
-        JDialog addDialog = new JDialog(view, "Thêm khách hàng mới", true);
-        addDialog.setSize(400, 300);
-        addDialog.setLayout(new GridLayout(5, 2, 10, 10));
-        addDialog.setLocationRelativeTo(view);
-
-        // Các trường nhập liệu
-        JLabel nameLabel = new JLabel("Tên khách hàng:");
-        JTextField nameField = new JTextField();
-        JLabel totalBillLabel = new JLabel("Tổng đã dùng:");
-        JTextField totalBillField = new JTextField();
-        JLabel phoneLabel = new JLabel("Số điện thoại:");
-        JTextField phoneField = new JTextField();
-        JLabel addressLabel = new JLabel("Địa chỉ:");
-        JTextField addressField = new JTextField();
-
-        // Nút xác nhận và hủy
-        JButton confirmButton = new JButton("Xác nhận");
-        JButton cancelButton = new JButton("Hủy");
-
-        // Thêm các thành phần vào dialog
-        addDialog.add(nameLabel);
-        addDialog.add(nameField);
-        addDialog.add(totalBillLabel);
-        addDialog.add(totalBillField);
-        addDialog.add(phoneLabel);
-        addDialog.add(phoneField);
-        addDialog.add(addressLabel);
-        addDialog.add(addressField);
-        addDialog.add(confirmButton);
-        addDialog.add(cancelButton);
-
-        // Sự kiện cho nút Xác nhận
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    // Lấy và kiểm tra dữ liệu
-                    String name = nameField.getText().trim();
-                    String totalBillText = totalBillField.getText().trim();
-                    String phone = phoneField.getText().trim();
-                    String address = addressField.getText().trim();
-
-                    if (name.isEmpty() || totalBillText.isEmpty() || phone.isEmpty() || address.isEmpty()) {
-                        JOptionPane.showMessageDialog(addDialog, "Vui lòng điền đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    double totalBill;
-                    try {
-                        totalBill = Double.parseDouble(totalBillText);
-                        if (totalBill < 0) {
-                            JOptionPane.showMessageDialog(addDialog, "Tổng đã dùng phải là số không âm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(addDialog, "Tổng đã dùng phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    if (!isValidPhoneNumber(phone)) {
-                        JOptionPane.showMessageDialog(addDialog, "Số điện thoại phải có đúng 10 chữ số!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    // Tạo đối tượng khách hàng
-                    Customer newCustomer = new Customer();
-                    newCustomer.setName(name);
-                    newCustomer.setTotalBill(BigDecimal.valueOf(totalBill));
-                    newCustomer.setPhone(phone);
-                    newCustomer.setAddress(address);
-
-                    // Gọi service để thêm khách hàng
-                    customerService.insertCustomer(newCustomer);
-
-                    // Hiển thị thông báo thành công và làm mới bảng
-                    JOptionPane.showMessageDialog(addDialog, "Thêm khách hàng thành công!");
-                    updateTable();
-
-                    // Đóng dialog
-                    addDialog.dispose();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(addDialog, "Lỗi khi thêm khách hàng: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        // Sự kiện cho nút Hủy
-        cancelButton.addActionListener(e -> addDialog.dispose());
-
-        // Hiển thị dialog
-        addDialog.setVisible(true);
-    }
-
-    private void showEditCustomerDialog() {
-        int selectedRow = view.getCustomerTable().getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(view, "Vui lòng chọn một khách hàng để sửa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        long customerId = (long) view.getCustomerTable().getValueAt(selectedRow, 0);
-        String currentName = (String) view.getCustomerTable().getValueAt(selectedRow, 1);
-        String currentTotalBill = (String) view.getCustomerTable().getValueAt(selectedRow, 2);
-        String currentPhone = (String) view.getCustomerTable().getValueAt(selectedRow, 3);
-        String currentAddress = (String) view.getCustomerTable().getValueAt(selectedRow, 4);
-
-        // Loại bỏ định dạng "vnđ" khỏi totalBill
-        currentTotalBill = currentTotalBill.replace("VND", "").replace(",", "");
-
-        JDialog editDialog = new JDialog(view, "Sửa thông tin khách hàng", true);
-        editDialog.setSize(400, 300);
-        editDialog.setLayout(new GridLayout(5, 2, 10, 10));
-        editDialog.setLocationRelativeTo(view);
-
-        JLabel nameLabel = new JLabel("Tên khách hàng:");
-        JTextField nameField = new JTextField(currentName);
-        JLabel totalBillLabel = new JLabel("Tổng đã dùng:");
-        JTextField totalBillField = new JTextField(currentTotalBill);
-        JLabel phoneLabel = new JLabel("Số điện thoại:");
-        JTextField phoneField = new JTextField(currentPhone);
-        JLabel addressLabel = new JLabel("Địa chỉ:");
-        JTextField addressField = new JTextField(currentAddress);
-
-        JButton confirmButton = new JButton("Xác nhận");
-        JButton cancelButton = new JButton("Hủy");
-
-        editDialog.add(nameLabel);
-        editDialog.add(nameField);
-        editDialog.add(totalBillLabel);
-        editDialog.add(totalBillField);
-        editDialog.add(phoneLabel);
-        editDialog.add(phoneField);
-        editDialog.add(addressLabel);
-        editDialog.add(addressField);
-        editDialog.add(confirmButton);
-        editDialog.add(cancelButton);
-
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    String name = nameField.getText().trim();
-                    String totalBillText = totalBillField.getText().trim();
-                    String phone = phoneField.getText().trim();
-                    String address = addressField.getText().trim();
-
-                    if (name.isEmpty() || totalBillText.isEmpty() || phone.isEmpty() || address.isEmpty()) {
-                        JOptionPane.showMessageDialog(editDialog, "Vui lòng điền đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    double totalBill;
-                    try {
-                        totalBill = Double.parseDouble(totalBillText);
-                        if (totalBill < 0) {
-                            JOptionPane.showMessageDialog(editDialog, "Tổng đã dùng phải là số không âm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(editDialog, "Tổng đã dùng phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    if (!isValidPhoneNumber(phone)) {
-                        JOptionPane.showMessageDialog(editDialog, "Số điện thoại phải có đúng 10 chữ số!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    Customer updatedCustomer = new Customer();
-                    updatedCustomer.setId((int) customerId);
-                    updatedCustomer.setName(name);
-                    updatedCustomer.setTotalBill(BigDecimal.valueOf(totalBill));
-                    updatedCustomer.setPhone(phone);
-                    updatedCustomer.setAddress(address);
-
-                    customerService.updateCustomer(updatedCustomer);
-                    JOptionPane.showMessageDialog(editDialog, "Cập nhật khách hàng thành công!");
-                    updateTable();
-                    editDialog.dispose();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(editDialog, "Lỗi khi cập nhật khách hàng: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        cancelButton.addActionListener(e -> editDialog.dispose());
-        editDialog.setVisible(true);
-    }
-
     private void deleteCustomers() {
         int[] selectedRows = view.getCustomerTable().getSelectedRows();
         if (selectedRows.length == 0) {
@@ -461,7 +319,6 @@ public class CustomerController {
             try {
                 customerService.deleteCustomers(customerIds);
                 JOptionPane.showMessageDialog(view, "Xóa " + customerIds.size() + " khách hàng thành công!");
-                // Nếu trang hiện tại không còn bản ghi, lùi về trang trước
                 if (view.getCustomerTable().getRowCount() == 0 && currentPage > 1) {
                     currentPage--;
                 }
@@ -478,14 +335,14 @@ public class CustomerController {
             currentKeyword = "";
         }
         currentPage = 1;
-        isSearchMessageShown = false; // Reset trạng thái thông báo
+        isSearchMessageShown = false;
         updateTable();
     }
 
     private void sortCustomers() {
         currentSortType = (String) view.getSortComboBox().getSelectedItem();
         currentPage = 1;
-        isSearchMessageShown = false; // Reset trạng thái thông báo
+        isSearchMessageShown = false;
         updateTable();
     }
 
@@ -516,14 +373,13 @@ public class CustomerController {
             int totalPages = getTotalPages();
             view.updatePaginationInfo(currentPage, totalPages);
 
-            // Cập nhật trạng thái nút phân trang
             view.getFirstPageButton().setEnabled(currentPage > 1);
             view.getPreviousPageButton().setEnabled(currentPage > 1);
             view.getNextPageButton().setEnabled(currentPage < totalPages);
             view.getLastPageButton().setEnabled(currentPage < totalPages);
 
             if (customers.isEmpty() && !currentKeyword.isEmpty() && !isSearchMessageShown) {
-                isSearchMessageShown = true; // Đánh dấu thông báo đã hiển thị
+                isSearchMessageShown = true;
                 JOptionPane.showMessageDialog(view, "Không tìm thấy khách hàng nào khớp với từ khóa: " + currentKeyword, "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (Exception ex) {

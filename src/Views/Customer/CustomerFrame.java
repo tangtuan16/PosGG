@@ -12,6 +12,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class CustomerFrame extends JFrame {
@@ -238,6 +240,118 @@ public class CustomerFrame extends JFrame {
 
     public JButton getExportExcelButton() {
         return exportExcelButton;
+    }
+
+    // New method: Show dialog for adding a customer
+    public void showAddCustomerDialog() {
+        JDialog addDialog = new JDialog(this, "Thêm khách hàng mới", true);
+        addDialog.setSize(400, 300);
+        addDialog.setLayout(new GridLayout(5, 2, 10, 10));
+        addDialog.setLocationRelativeTo(this);
+
+        JLabel nameLabel = new JLabel("Tên khách hàng:");
+        JTextField nameField = new JTextField();
+        JLabel totalBillLabel = new JLabel("Tổng đã dùng:");
+        JTextField totalBillField = new JTextField();
+        JLabel phoneLabel = new JLabel("Số điện thoại:");
+        JTextField phoneField = new JTextField();
+        JLabel addressLabel = new JLabel("Địa chỉ:");
+        JTextField addressField = new JTextField();
+        JButton confirmButton = new JButton("Xác nhận");
+        JButton cancelButton = new JButton("Hủy");
+
+        addDialog.add(nameLabel);
+        addDialog.add(nameField);
+        addDialog.add(totalBillLabel);
+        addDialog.add(totalBillField);
+        addDialog.add(phoneLabel);
+        addDialog.add(phoneField);
+        addDialog.add(addressLabel);
+        addDialog.add(addressField);
+        addDialog.add(confirmButton);
+        addDialog.add(cancelButton);
+
+        confirmButton.addActionListener(e -> {
+            String name = nameField.getText().trim();
+            String totalBillText = totalBillField.getText().trim();
+            String phone = phoneField.getText().trim();
+            String address = addressField.getText().trim();
+
+            try {
+                controller.addCustomer(name, totalBillText, phone, address, addDialog);
+                addDialog.dispose();
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(addDialog, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(addDialog, "Lỗi khi thêm khách hàng: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        cancelButton.addActionListener(e -> addDialog.dispose());
+        addDialog.setVisible(true);
+    }
+
+    // New method: Show dialog for editing a customer
+    public void showEditCustomerDialog() {
+        int selectedRow = customerTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một khách hàng để sửa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        long customerId = (long) customerTable.getValueAt(selectedRow, 0);
+        String currentName = (String) customerTable.getValueAt(selectedRow, 1);
+        String currentTotalBill = (String) customerTable.getValueAt(selectedRow, 2);
+        String currentPhone = (String) customerTable.getValueAt(selectedRow, 3);
+        String currentAddress = (String) customerTable.getValueAt(selectedRow, 4);
+
+        currentTotalBill = currentTotalBill.replace("VND", "").replace(",", "");
+
+        JDialog editDialog = new JDialog(this, "Sửa thông tin khách hàng", true);
+        editDialog.setSize(400, 300);
+        editDialog.setLayout(new GridLayout(5, 2, 10, 10));
+        editDialog.setLocationRelativeTo(this);
+
+        JLabel nameLabel = new JLabel("Tên khách hàng:");
+        JTextField nameField = new JTextField(currentName);
+        JLabel totalBillLabel = new JLabel("Tổng đã dùng:");
+        JTextField totalBillField = new JTextField(currentTotalBill);
+        JLabel phoneLabel = new JLabel("Số điện thoại:");
+        JTextField phoneField = new JTextField(currentPhone);
+        JLabel addressLabel = new JLabel("Địa chỉ:");
+        JTextField addressField = new JTextField(currentAddress);
+        JButton confirmButton = new JButton("Xác nhận");
+        JButton cancelButton = new JButton("Hủy");
+
+        editDialog.add(nameLabel);
+        editDialog.add(nameField);
+        editDialog.add(totalBillLabel);
+        editDialog.add(totalBillField);
+        editDialog.add(phoneLabel);
+        editDialog.add(phoneField);
+        editDialog.add(addressLabel);
+        editDialog.add(addressField);
+        editDialog.add(confirmButton);
+        editDialog.add(cancelButton);
+
+        confirmButton.addActionListener(e -> {
+            String name = nameField.getText().trim();
+            String totalBillText = totalBillField.getText().trim();
+            String phone = phoneField.getText().trim();
+            String address = addressField.getText().trim();
+
+            try {
+                controller.editCustomer(customerId, name, totalBillText, phone, address, editDialog);
+                editDialog.dispose();
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(editDialog, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(editDialog, "Lỗi khi cập nhật khách hàng: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        cancelButton.addActionListener(e -> editDialog.dispose());
+        editDialog.setVisible(true);
     }
 
     public static void main(String[] args) {

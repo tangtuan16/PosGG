@@ -13,7 +13,7 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="pos_gg@localhost" uuid="cfe47bdf-ea9c-4c7b-bfc0-47e1b8e9ec9c">
+    <data-source source="LOCAL" name="pos_gg@localhost" uuid="6d59fdb3-a2b3-45f9-8360-8c3716bbeda0">
       <driver-ref>mysql_aurora</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
