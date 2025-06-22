@@ -1,13 +1,18 @@
-import Views.HomeFrame;
-import Views.Sales.InvoiceSearchFrame;
-import Views.Sales.SaleFrame;
-
+import Views.Auth.RegisterFrame;
 import javax.swing.*;
-import java.util.TimeZone;
 
 public class Main {
     public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
-        SwingUtilities.invokeLater(() -> (new HomeFrame()).setVisible(true));
+        System.out.println("Hello, World!");
+        System.out.println("User + password: " +  System.getenv("DB_USER"));
+        String[] options = {"Login", "Register"};
+        int choice = JOptionPane.showOptionDialog(null, "Select an option", "Welcome",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
+        if (choice == 1) {
+            new RegisterFrame().setVisible(true);
+        } else {
+            new Views.Auth.LoginFrame().setVisible(true);
+        }
     }
 }

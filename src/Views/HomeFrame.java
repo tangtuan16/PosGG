@@ -1,6 +1,8 @@
 package Views;
 
+import Models.Session;
 import Utils.FrameManager;
+import Views.Auth.LoginFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,10 +42,10 @@ public class HomeFrame extends JFrame {
         JButton btnLogout = new JButton("Đăng xuất");
         btnLogout.setFont(buttonFont);
 
-//        if ("admin".equals(user.getRole())) {
-//            buttonPanel.add(btnProduct);
-//            buttonPanel.add(btnAccount);
-//        }
+        if ("admin".equals(Session.getInstance().getUser().getRole())) {
+            buttonPanel.add(btnProduct);
+            buttonPanel.add(btnAccount);
+        }
 
         buttonPanel.add(btnSale);
         buttonPanel.add(btnCustomer);
@@ -92,6 +94,6 @@ public class HomeFrame extends JFrame {
         dispose();
         FrameManager.closeAll();
         JOptionPane.showMessageDialog(this, "Bạn đã đăng xuất!");
-       // SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }
