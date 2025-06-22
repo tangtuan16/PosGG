@@ -1,4 +1,6 @@
 package Views.Products;
 
-public class ProductsFrames {
+import javax.swing.*;
+
+public class ProductsFrames extends JFrame {
 }
